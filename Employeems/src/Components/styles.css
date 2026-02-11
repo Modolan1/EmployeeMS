@@ -1,0 +1,23 @@
+.loginPage {
+    background-color: rgb(44, 182, 182);
+}
+
+.loginForm{
+    background-color:rgba(1, 32green, 93, 0.6);
+    color: white;
+}
+
+button{
+    background-color: rgba(4, 67, 57, 0.707);
+    color: #fff;
+}
+
+ul li :hover{
+    background-color: gray;
+}
+
+.employee_image{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
