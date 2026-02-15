@@ -7,6 +7,9 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // CORS configuration
+app.get('/', (req, res) => {
+  res.send('Application is running successfully 🚀');
+});
 app.use(cors({
     origin: function (origin, callback) {
         const allowedOrigins = ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"];
@@ -30,6 +33,6 @@ app.use('/auth', adminRoute)
 app.use(express.static('public'))
 
 app.listen(port, ()=>{
-    console.log("Server running on port ${port}");
+    console.log(`Server running on port ${port}`);
 })
 
