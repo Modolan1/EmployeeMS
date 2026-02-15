@@ -2,57 +2,60 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 import { adminRoute } from "./server/Routes/AdminRoute.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-/* Fix __dirname for ES modules */
+// __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-/* Middleware */
 app.use(express.json());
 app.use(cookieParser());
 
-/* CORS
-   - Localhost allowed for development
-   - Same-origin allowed in production (Elastic Beanstalk)
-*/
+// CORS (dev + production)
 app.use(
   cors({
-    origin: (origin, callback) => {
-      const allowedOrigins = [
+    origin: (origin, cb) => {
+      const allowed = [
         "http://localhost:5173",
         "http://localhost:5174",
-        "http://localhost:5175"
+        "http://localhost:5175",
       ];
-
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(null, true); // allow EB domain
-      }
+      if (!origin || allowed.includes(origin)) return cb(null, true);
+      return cb(null, true); // allow EB domain
     },
-    credentials: true
+    credentials: true,
   })
 );
 
-/* API Routes */
+// API routes first
 app.use("/auth", adminRoute);
 
-/* Serve Vite React build */
-app.use(express.static(path.join(__dirname, "server", "Public", "dist")));
+// Frontend build path (use LOWERCASE public)
+const frontendDir = path.join(__dirname, "server", "public", "dist");
+const indexHtml = path.join(frontendDir, "index.html");
 
-app.get("*", (req, res) => {
-  res.sendFile(
-    path.join(__dirname, "server", "Public", "dist", "index.html")
-  );
-});
+// Serve frontend only if it exists (prevents 502 crashes)
+if (fs.existsSync(indexHtml)) {
+  app.use(express.static(frontendDir));
 
+  // React Router fallback
+  app.get("*", (req, res) => {
+    res.sendFile(indexHtml);
+  });
+} else {
+  // Helpful fallback so you see what's wrong instead of 502
+  app.get("/", (req, res) => {
+    res
+      .status(200)
+      .send("Backend is running, but frontend build not found. Build & deploy dist.");
+  });
+}
 
-/* Start server */
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
   console.log(`Server running on port ${port}`);
 });
