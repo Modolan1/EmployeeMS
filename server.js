@@ -36,7 +36,7 @@ app.use(
 app.use("/auth", adminRoute);
 
 // Frontend build path (use LOWERCASE public)
-const frontendDir = path.join(__dirname, "server", "public", "dist");
+const frontendDir = path.join(__dirname, "server", "Public", "dist");
 const indexHtml = path.join(frontendDir, "index.html");
 
 // Serve frontend only if it exists (prevents 502 crashes)
