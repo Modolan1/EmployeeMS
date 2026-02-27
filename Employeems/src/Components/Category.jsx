@@ -1,26 +1,50 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export const Category = () => {
-  const [category, setCategory] = React.useState([]);
+  const [category, setCategory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-   axios.get('http://localhost:3000/auth/category')
-    .then(result => {
-      if (result.data.Status){ 
-        setCategory(result.data.result);
-        console.log(result.data.result);
-      } else{
-        alert('Failed to load categories: ' + result.data.Error);
-      }
+    console.log('📋 Fetching categories...');
+    setLoading(true);
+    setError(null);
+    
+    axios.get('http://localhost:3000/auth/category', {
+      withCredentials: true
     })
-    .catch(err => {
-      console.error('Error fetching categories:', err);
-      alert('Unable to connect to server. Please check if the server is running.');
-    })
+      .then(result => {
+        console.log('✅ Category response:', result.data);
+        if (result.data.Status){ 
+          const catData = result.data.Result || result.data.result || [];
+          console.log('✅ Categories loaded:', catData.length);
+          setCategory(catData);
+        } else {
+          const errorMsg = result.data.Error || "Unknown error";
+          console.error('❌ Failed to load categories:', errorMsg);
+          setError('Failed to load categories: ' + errorMsg);
+        }
+      })
+      .catch(err => {
+        console.error('❌ Error fetching categories:', err);
+        const errorMsg = err.response?.data?.Error || err.message || 'Unable to connect to server';
+        setError(errorMsg);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
+
+  if (loading) {
+    return <div className="px-5 mt-3 p-4">Loading categories...</div>;
+  }
+
+  if (error) {
+    return <div className="px-5 mt-3 alert alert-danger">{error}</div>;
+  }
   
   return (
     <div className='px-5 mt-3'>
@@ -28,33 +52,33 @@ export const Category = () => {
             <h3>Category list</h3>
         </div>
         <Link to="/dashboard/add_category" className='btn btn-success'>Add Category</Link>
-        <div className='mt-3'>
-          <table className='table table-striped mt-3 px-5'>
-      <thead>
-        <tr>
-          <th>Name</th>
-          {/* <th>Category Name</th>
-          <th>Actions</th> */}
-        </tr>
-        </thead>
-        <tbody>
-          {
-          category.map(c => (
-          <tr key={c.id}>
-            
-            <td>{c.name}</td>
-            {/* <td>
-              <button className='btn btn-primary btn-sm me-2'>Edit</button>
-              </td> */}
-          </tr>
-          ))
-        }
-          </tbody>
-    </table>
-        </div>
-
+        
+        {category.length === 0 ? (
+          <div className="alert alert-info mt-3">No categories found. Click "Add Category" to create one.</div>
+        ) : (
+          <div className='mt-3'>
+            <table className='table table-striped mt-3 px-5'>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  category.map(c => (
+                    <tr key={c.id}>
+                      <td>{c.id}</td>
+                      <td>{c.name}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+        )}
     </div>
-    
   )
 }
- export default Category
+
+export default Category

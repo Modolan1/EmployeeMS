@@ -20,8 +20,8 @@ const AddEmployee = () => {
    axios.get('http://localhost:3000/auth/category')
     .then(result => {
       if (result.data.Status){ 
-        setCategory(result.data.result);
-        console.log(result.data.result);
+        setCategory(result.data.Result || result.data.result || []);
+        console.log(result.data.Result || result.data.result);
       } else{
         alert('Failed to load categories: ' + result.data.Error);
       }
@@ -34,40 +34,48 @@ const AddEmployee = () => {
   // const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    
-    const formData = new FormData();
-    formData.append('name', employee.name);
-    formData.append('email', employee.email);
-    formData.append('password', employee.password);
-    formData.append('salary', employee.salary);
-    formData.append('address', employee.address);
-    formData.append('image', employee.image);
-    formData.append('category_id', employee.category_id);
+  e.preventDefault();
 
-    await axios.post(
-      `http://localhost:3000/auth/add_employee`,
-      formData
-    )
-    .then(result => {
-      if(result.data.Status) {
-        alert('Employee added successfully!');
-        navigate('/dashboard/employee');
-      } else {
-        alert('Failed to add employee: ' + result.data.Error);
-      }
-    })
-    .catch(err => {
-      console.error('Error adding employee:', err);
-      if (err.response) {
-        alert('Server error: ' + (err.response.data.Error || 'Unable to add employee'));
-      } else if (err.request) {
-        alert('Unable to connect to server. Please check if the server is running.');
-      } else {
-        alert('Error: ' + err.message);
-      }
-    })
+  if (!employee.name || !employee.email || !employee.password || !employee.salary || !employee.address || !employee.category_id) {
+    alert("Please fill in all required fields");
+    return;
   }
+
+  const formData = new FormData();
+  formData.append("name", employee.name.trim());
+  formData.append("email", employee.email.trim());
+  formData.append("password", employee.password);
+  formData.append("salary", employee.salary);         // keep as string/number
+  formData.append("address", employee.address.trim());
+  formData.append("category_id", employee.category_id);
+
+  // only append image if user selected one
+  if (employee.image) {
+    formData.append("image", employee.image);
+  }
+
+  try {
+    const res = await axios.post(
+      "http://localhost:3000/auth/add_employee",
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+
+    console.log("Add employee response:", res.data);
+
+    if (res.data?.Status) {
+      alert("Employee added successfully!");
+      navigate("/dashboard/employee");
+    } else {
+      alert("Failed to add employee: " + (res.data?.Error || "Unknown error"));
+    }
+  } catch (err) {
+    console.error("Error adding employee:", err?.response?.data || err.message);
+    alert(err?.response?.data?.Error || "Server error adding employee");
+  }
+};
 
   //   setForm({ name: '', email: '', salary: '', category: '' })
   //   setEditId(null)
@@ -176,7 +184,8 @@ const AddEmployee = () => {
                 <label htmlFor='category'>Category:</label>
                 <select name='category'  id='category' 
                 className='form-select rounded-0'
-                onChange={(e)=> setEmployee({...employee, category_id: e.target.value})}>
+                onChange={(e)=> setEmployee({...employee, category_id: e.target.value})}
+                required>
                     <option value="">Select Category</option>
                     {category.map(c =>{
                         return<option key={c.id} value={c.id}>{c.name}</option>

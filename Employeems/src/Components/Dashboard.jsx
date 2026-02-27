@@ -10,7 +10,9 @@ const Dashboard = () => {
     await axios.get('http://localhost:3000/auth/logout', {
       withCredentials: true
     })
-    navigate('/')
+    // to ensure the not going back to last section after logout
+    localStorage.removeItem("valid")
+    navigate('/start')
   }
 
   return (

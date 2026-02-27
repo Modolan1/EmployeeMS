@@ -1,0 +1,159 @@
+:root {
+  --bg1: #4e73df;
+  --bg2: #1cc88a;
+  --text: #111827;
+  --muted: #6b7280;
+  --card: rgba(255, 255, 255, 0.92);
+  --border: rgba(17, 24, 39, 0.08);
+  --shadow: 0 18px 55px rgba(0, 0, 0, 0.22);
+
+  --admin: #e74a3b;
+  --adminHover: #cf3d30;
+
+  --emp: #4e73df;
+  --empHover: #2e59d9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: linear-gradient(135deg, var(--bg1), var(--bg2));
+}
+
+.card2 {
+  width: min(440px, 100%);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+h1 {
+  margin: 10px 0 8px;
+  font-size: 28px;
+}
+
+.muted {
+  color: var(--muted);
+  margin: 0 0 18px;
+  line-height: 1.5;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  background: rgba(17, 24, 39, 0.06);
+}
+
+.badge-red {
+  background: rgba(231, 74, 59, 0.12);
+}
+
+.badge-blue {
+  background: rgba(78, 115, 223, 0.12);
+}
+
+.grid {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.btn2 {
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  padding: 14px 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.12s ease, filter 0.12s ease, background 0.12s ease;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-admin {
+  background: var(--admin);
+  color: white;
+}
+
+.btn-admin:hover {
+  background: var(--adminHover);
+}
+
+.btn-employee {
+  background: var(--emp);
+  color: white;
+}
+
+.btn-employee:hover {
+  background: var(--empHover);
+}
+
+.form {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #374151;
+}
+
+input {
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(17, 24, 39, 0.14);
+  outline: none;
+  font-size: 14px;
+  background: white;
+}
+
+input:focus {
+  border-color: rgba(78, 115, 223, 0.65);
+  box-shadow: 0 0 0 4px rgba(78, 115, 223, 0.15);
+}
+
+.link {
+  display: inline-block;
+  margin-top: 14px;
+  font-weight: 700;
+  color: #1f2937;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.hint {
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--muted);
+}

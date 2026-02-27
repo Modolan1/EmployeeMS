@@ -24,7 +24,7 @@ const EditEmployee = () => {
     axios.get('http://localhost:3000/auth/category')
       .then(result => {
         if (result.data.Status) {
-          setCategory(result.data.result);
+          setCategory(result.data.Result || result.data.result || []);
         } else {
           alert(result.data.Error);
         }
@@ -34,15 +34,17 @@ const EditEmployee = () => {
     // Fetch employee by ID
     axios.get(`http://localhost:3000/auth/employee/${id}`)
       .then(result => {
-        const emp = result.data.Result[0];
-        setEmployee(prev => ({
-          ...prev,
-          name: emp.name,
-          email: emp.email,
-          salary: emp.salary,
-          address: emp.address,
-          category_id: emp.category_id
-        }));
+        const emp = (result.data.Result || result.data.result || [])[0];
+        if (emp) {
+          setEmployee(prev => ({
+            ...prev,
+            name: emp.name,
+            email: emp.email,
+            salary: emp.salary,
+            address: emp.address,
+            category_id: emp.category_id
+          }));
+        }
       })
       .catch(err => console.error(err));
   }, [id]);
@@ -54,7 +56,6 @@ const EditEmployee = () => {
     const formData = new FormData();
     formData.append('name', employee.name);
     formData.append('email', employee.email);
-    formData.append('password', employee.password);
     formData.append('salary', employee.salary);
     formData.append('address', employee.address);
     formData.append('category_id', employee.category_id);
@@ -69,10 +70,21 @@ const EditEmployee = () => {
           alert('Employee updated successfully');
           navigate('/dashboard/employee');
         } else {
-          alert(result.data.Error);
+          alert('Failed to update: ' + result.data.Error);
         }
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        console.error('Error updating employee:', err);
+        if (err.response) {
+          const errorMsg = err.response.data?.Error || err.response.statusText || 'Unable to update employee';
+          console.error('Server error response:', errorMsg);
+          alert('Server error: ' + errorMsg);
+        } else if (err.request) {
+          alert('Unable to connect to server. Please check if the server is running.');
+        } else {
+          alert('Error: ' + err.message);
+        }
+      });
   };
 
   return (

@@ -1,27 +1,18 @@
-import mysql from 'mysql'
+import mysql from 'mysql2'
 
-const con = mysql.createConnection({
-    host:"localhost",
+const pool = mysql.createPool({
+    host: "localhost",
     user: "root",
     password: "",
-    database: "employeems"
+    database: "employeems",
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 })
 
-con.connect(function(err){
-    if(err){
-        console.log("Database connection error:", err.message)
-        console.log("Error code:", err.code)
-        console.log("Please ensure:")
-        console.log("1. MySQL server is running")
-        console.log("2. Database 'employeems' exists")
-        console.log("3. User 'root' has proper permissions")
-    }else{
-        console.log("Successfully connected to database")
-    }
-})
+const promisePool = pool.promise()
 
-// Handle connection errors
-con.on('error', function(err) {
+pool.on('error', function(err) {
     console.log('Database error:', err);
     if(err.code === 'PROTOCOL_CONNECTION_LOST') {
         console.error('Database connection was closed.')
@@ -32,6 +23,10 @@ con.on('error', function(err) {
     if(err.code === 'ECONNREFUSED') {
         console.error('Database connection was refused.')
     }
+    if(err.code === 'ECONNRESET') {
+        console.error('Database connection was reset.')
+    }
 })
 
-export default con
+export { promisePool }
+export default pool
